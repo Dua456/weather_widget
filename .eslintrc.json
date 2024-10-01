@@ -1,0 +1,8 @@
+
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "warn", // Change to 'off' to disable entirely
+    "@typescript-eslint/no-empty-interface": "warn" // Change to 'off' to disable entirely
+  }
+}
