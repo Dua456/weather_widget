@@ -1,8 +1,8 @@
-"use client"; 
+"use client";
 
 // Import necessary hooks and types from React
 import { useState, ChangeEvent, FormEvent } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -31,36 +31,45 @@ export default function WeatherWidget() {
 
     const trimmedLocation = location.trim();
     if (trimmedLocation === "") {
-      setError("Please enter a valid location."); 
-      setWeather(null); 
+      setError("Please enter a valid location.");
+      setWeather(null);
       return;
     }
 
-    setIsLoading(true); 
+    setIsLoading(true);
     setError(null);
     try {
+      // Log the API key and location for debugging
+      console.log("API Key:", process.env.NEXT_PUBLIC_WEATHER_API_KEY);
+      console.log("Location:", trimmedLocation);
+
       // Fetch weather data from the weather API
       const response = await fetch(
-         /* http://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${trimmedLocation} */
-        `http://api.weatherapi.com/v1/current.json?key=fc32057c46ba431eb30100855242909&q=${trimmedLocation}`
+        `https://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${trimmedLocation}`
       );
+
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error Response:", errorData);
         throw new Error("City not found");
       }
+
       const data = await response.json();
+      console.log("Weather Data:", data);
+
       const weatherData: WeatherData = {
-        temperature: data.current.temp_c, 
-        description: data.current.condition.text, 
-        location: data.location.name, 
+        temperature: data.current.temp_c, // Use Celsius
+        description: data.current.condition.text,
+        location: data.location.name,
         unit: "C",
       };
       setWeather(weatherData); // Set the fetched weather data
     } catch (error) {
       console.error("Error fetching weather data:", error);
-      setError("City not found. Please try again."); 
-      setWeather(null); 
+      setError("City not found. Please try again.");
+      setWeather(null);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -105,16 +114,16 @@ export default function WeatherWidget() {
       case "fog":
         return "Be careful, there's fog outside.";
       default:
-        return description; 
+        return description;
     }
   }
 
   // Function to get a location message based on the current time
   function getLocationMessage(location: string): string {
     const currentHour = new Date().getHours();
-    const isNight = currentHour >= 18 || currentHour < 6; 
+    const isNight = currentHour >= 18 || currentHour < 6;
 
-    return ` ${location} ${isNight ? "at Night" : "During the Day"}`;
+    return `${location} ${isNight ? "at Night" : "During the Day"}`;
   }
 
   // JSX return statement rendering the weather widget UI
